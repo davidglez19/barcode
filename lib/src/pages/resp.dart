@@ -12,15 +12,13 @@ class RespuestaPage extends StatefulWidget {
 }
 
 class _RespuestaPageState extends State<RespuestaPage> {
-  @override
-  void initState() {
-    super.initState();
 
-    Future.delayed(Duration(milliseconds: 4000 ), (){
-      
-      Navigator.popAndPushNamed(context, 'home');
+
+  cambiarPagina(){
+    
+    Future.delayed(Duration(milliseconds: 2000), (){
+    Navigator.popAndPushNamed(context, 'home');
     });
-
     
   }
 
@@ -57,11 +55,12 @@ class _RespuestaPageState extends State<RespuestaPage> {
     return FutureBuilder(
       future: productos.getProductos(productosService.idCodigo),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
+        
        if(!snapshot.hasData) {
           return CircularProgressIndicator();
         } else if(snapshot.hasData && snapshot.data.precioUnitario !=null) {
           // productosService.productosList.add(snapshot.data);
-          
+          cambiarPagina();
           double precio  = double.parse(snapshot.data.precioUnitario);
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -123,6 +122,7 @@ class _RespuestaPageState extends State<RespuestaPage> {
             ],
           );
         }else{
+          cambiarPagina();
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
