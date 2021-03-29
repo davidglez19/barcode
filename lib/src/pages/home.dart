@@ -36,10 +36,10 @@ class HomePage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 45),
                 child: _boton(_textStyle, 'Escaner', Icons.qr_code, () async {
-                  // String scannerCode = await FlutterBarcodeScanner.scanBarcode(
-                  //     '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
-                  _productoServices.idCodigo = '0751214586285';
-                  Navigator.pushNamed(context, 'respuesta');
+                  String scannerCode = await FlutterBarcodeScanner.scanBarcode(
+                      '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
+                  _productoServices.idCodigo = scannerCode;
+                  Navigator.popAndPushNamed(context, 'respuesta');
                 }),
               ),
               _boton(_textStyle, 'Buscar', Icons.search, () {

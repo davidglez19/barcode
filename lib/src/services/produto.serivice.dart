@@ -29,19 +29,22 @@ class ProductosServices extends ChangeNotifier {
 
 // http://192.168.0.26:1989/api/productos
 // https://serverssc.herokuapp.com/api/productos
+//http://ursoft.ddns.net/verificador/public/articulos/00-120
 
-  String _url = 'serverssc.herokuapp.com';
+  String _url = 'ursoft.ddns.net';
 
   Future getProductos(String id) async {
     print(id);
-    final url = Uri.https(_url, 'api/productos/$id');
+    final url = Uri.http(_url, 'verificador/public/articulos/$id');
     final resp = await http.get(url);
 
     final decodedData = json.decode(resp.body);
-
-    final producto = new Productos.fromJson(decodedData['productos']);
-    print('DATOS:  $producto');
-
+    print(decodedData.length);
+    
+    final producto = new Productos.fromJson(decodedData);
+    
+    print('DATOS:  ${producto.precioUnitario}');
+    
     return producto;
   }
 }
