@@ -39,10 +39,10 @@ class HomePage extends StatelessWidget {
                   String scannerCode = await FlutterBarcodeScanner.scanBarcode(
                       '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
                   _productoServices.idCodigo = scannerCode;
-                  if (scannerCode != '-1'){
-                    return Navigator.popAndPushNamed(context, 'respuesta');
+                  if (scannerCode != '-1') {
+                    // return Navigator.popAndPushNamed(context, 'respuesta');
+                    return Navigator.pushNamed(context, 'respuesta');
                   }
-                  
                 }),
               ),
               _boton(_textStyle, 'Buscar', Icons.search, () {

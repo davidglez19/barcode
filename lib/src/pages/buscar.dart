@@ -1,9 +1,13 @@
+import 'package:barcode/src/services/produto.serivice.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BuscarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    // final size = MediaQuery.of(context).size;
+    final productosService = Provider.of<ProductosServices>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Buscar por nombre'),
@@ -16,7 +20,7 @@ class BuscarPage extends StatelessWidget {
               child: TextField(
                 keyboardType: TextInputType.number,
                 onChanged: (String value) {
-                  print(value);
+                  productosService.idCodigo = value;
                 },
                 decoration: InputDecoration(
                     icon: Icon(Icons.search), labelText: 'Clave'),
@@ -36,7 +40,9 @@ class BuscarPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'listar');
+                  },
                   child: ListTile(
                     leading: Icon(
                       Icons.search_sharp,

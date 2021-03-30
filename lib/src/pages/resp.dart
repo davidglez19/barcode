@@ -1,8 +1,5 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 
 import 'package:barcode/src/services/produto.serivice.dart';
 
@@ -12,16 +9,13 @@ class RespuestaPage extends StatefulWidget {
 }
 
 class _RespuestaPageState extends State<RespuestaPage> {
+  // cambiarPagina(){
 
+  //   Future.delayed(Duration(milliseconds: 2000), (){
+  //   Navigator.popAndPushNamed(context, 'home');
+  //   });
 
-  cambiarPagina(){
-    
-    Future.delayed(Duration(milliseconds: 2000), (){
-    Navigator.popAndPushNamed(context, 'home');
-    });
-    
-  }
-
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -39,15 +33,14 @@ class _RespuestaPageState extends State<RespuestaPage> {
 
   Widget _productos(Size size, BuildContext context) {
     final txtResult =
-        TextStyle(fontWeight: FontWeight.bold, fontSize: 23, letterSpacing: 2);
+        TextStyle(fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 2);
     final txtDetalles = TextStyle(
         fontWeight: FontWeight.bold,
-        fontSize: 40,
+        fontSize: 45,
         letterSpacing: 2,
         color: Colors.teal);
 
     final productos = new ProductosServices();
-
 
     final productosService = Provider.of<ProductosServices>(context);
     // productos.getProductos(productosService.idCodigo);
@@ -55,13 +48,15 @@ class _RespuestaPageState extends State<RespuestaPage> {
     return FutureBuilder(
       future: productos.getProductos(productosService.idCodigo),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        
-       if(!snapshot.hasData) {
+        if (!snapshot.hasData) {
           return CircularProgressIndicator();
-        } else if(snapshot.hasData && snapshot.data.precioUnitario !=null) {
+        } else if (snapshot.hasData && snapshot.data.precioUnitario != null) {
           // productosService.productosList.add(snapshot.data);
-          cambiarPagina();
-          double precio  = double.parse(snapshot.data.precioUnitario);
+
+          // TODO:QUITAR LOS COMENTARIOS
+
+          // cambiarPagina();
+          double precio = double.parse(snapshot.data.precioUnitario);
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -76,7 +71,13 @@ class _RespuestaPageState extends State<RespuestaPage> {
                     gradient: LinearGradient(
                         begin: Alignment.centerRight,
                         end: Alignment.bottomCenter,
-                        colors: [Color(0xFF0ac3f4), Color(0xff067592)])),
+                        colors: [Color(0xFF0ac3f4), Color(0xff067592)]),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color(0xFFF2F0F4),
+                          blurRadius: 5,
+                          offset: Offset(1, 5)),
+                    ]),
                 child: Text(
                   'Producto',
                   style: TextStyle(
@@ -98,56 +99,55 @@ class _RespuestaPageState extends State<RespuestaPage> {
                 ]),
                 child: Padding(
                   padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          '${(snapshot.data.nombreArticulo).toString().toUpperCase()}', textAlign: TextAlign.center,
-                          style: txtResult,
-                        ),
-                        
-                        Text(
                           '\$${(precio).toStringAsFixed(2)}',
                           style: txtDetalles,
                         ),
                         Text(
-                          'Existencias: ${(snapshot.data.existencia).toString().toUpperCase()}',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          '${(snapshot.data.nombreArticulo).toString().toUpperCase()}',
+                          textAlign: TextAlign.center,
+                          style: txtResult,
+                        ),
+                        Text(
+                          'Existencias: ${(snapshot.data.existencia).toString().toUpperCase()} ${snapshot.data.unidadVenta}',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green),
                         ),
                       ]),
                 ),
               ),
             ],
           );
-        }else{
-          cambiarPagina();
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: size.width * 0.8,
-                height: 50,
-                padding: EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: LinearGradient(
-                        begin: Alignment.centerRight,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.red, Colors.redAccent])),
-                child: Text(
-                  'Producto no encontrado',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600),
-                  textAlign: TextAlign.center,
-                ),
+        } else {
+          // cambiarPagina();
+          return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Container(
+              width: size.width * 0.8,
+              height: 50,
+              padding: EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  gradient: LinearGradient(
+                      begin: Alignment.centerRight,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.red, Colors.redAccent])),
+              child: Text(
+                'Producto no encontrado',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
               ),
-              
-              ]
-            );
+            ),
+          ]);
         }
       },
     );

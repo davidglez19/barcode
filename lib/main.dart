@@ -1,3 +1,5 @@
+import 'package:barcode/src/models/producto.model.dart';
+import 'package:barcode/src/pages/lista.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +22,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => ProductosServices(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Productos(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -30,6 +35,7 @@ class MyApp extends StatelessWidget {
           'home': (_) => HomePage(),
           'buscar': (_) => BuscarPage(),
           'respuesta': (_) => RespuestaPage(),
+          'listar': (_) => ListaPage(),
         },
         theme: ThemeData(
             primaryColor: Colors.teal[500],
