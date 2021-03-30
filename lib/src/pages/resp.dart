@@ -9,13 +9,13 @@ class RespuestaPage extends StatefulWidget {
 }
 
 class _RespuestaPageState extends State<RespuestaPage> {
-  // cambiarPagina(){
+  cambiarPagina(){
 
-  //   Future.delayed(Duration(milliseconds: 2000), (){
-  //   Navigator.popAndPushNamed(context, 'home');
-  //   });
+    Future.delayed(Duration(milliseconds: 2000), (){
+    Navigator.popAndPushNamed(context, 'home');
+    });
 
-  // }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class _RespuestaPageState extends State<RespuestaPage> {
 
           // TODO:QUITAR LOS COMENTARIOS
 
-          // cambiarPagina();
+          cambiarPagina();
           double precio = double.parse(snapshot.data.precioUnitario);
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -126,7 +126,7 @@ class _RespuestaPageState extends State<RespuestaPage> {
             ],
           );
         } else {
-          // cambiarPagina();
+          cambiarPagina();
           return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
               width: size.width * 0.8,

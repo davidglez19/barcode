@@ -37,7 +37,7 @@ class ProductosServices extends ChangeNotifier {
     return producto;
   }
 
-  Future getProductosPorNombre(String id) async {
+  Future<List<Productos>> getProductosPorNombre(String id) async {
     print(id);
     final url = Uri.http(_url, 'verificador/public/articulos/clave/$id');
     final resp = await http.get(url);
@@ -46,8 +46,9 @@ class ProductosServices extends ChangeNotifier {
     print(decodedData.length);
     print('Data del http: $decodedData');
 
-    final productos = new Productos.fromJsonList(decodedData);
+    final productos = new ProductosList.fromJsonList(decodedData);
+    print(productos.productosList[0].nombreArticulo);
 
-    return productos;
+    return productos.productosList;
   }
 }

@@ -6,8 +6,24 @@ Productos productosFromJson(String str) => Productos.fromJson(json.decode(str));
 
 String productosToJson(Productos data) => json.encode(data.toJson());
 
-class Productos extends ChangeNotifier {
+class ProductosList {
   List<Productos> productosList = [];
+
+  ProductosList();
+
+  ProductosList.fromJsonList(List<dynamic> jsonList) {
+    if (jsonList == null) return;
+    for(var item in jsonList){
+      final producto = new Productos.fromJson(item);
+      productosList.add(producto);
+    }
+  }
+
+}
+
+
+class Productos extends ChangeNotifier {
+  
 
   Productos({
     this.articuloId,
@@ -23,18 +39,7 @@ class Productos extends ChangeNotifier {
   String existencia;
   String unidadVenta;
 
-  Productos.fromJsonList(List<dynamic> jsonList) {
-    if (jsonList == null) return;
-    print('Model: ${jsonList[1]}');
-    print('Lenght: ${jsonList.length}');
-
-    for (int i = 0; i < jsonList.length; i++) {
-      final producto = new Productos.fromJson(jsonList[i]);
-      print(producto.nombreArticulo);
-      this.productosList.add(producto);
-    }
-    print('Listado completo ${this.productosList[5].nombreArticulo}');
-  }
+  
 
   factory Productos.fromJson(Map<String, dynamic> json) => Productos(
         articuloId: json["ARTICULO_ID"],

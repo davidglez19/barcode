@@ -40,8 +40,8 @@ class HomePage extends StatelessWidget {
                       '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
                   _productoServices.idCodigo = scannerCode;
                   if (scannerCode != '-1') {
-                    // return Navigator.popAndPushNamed(context, 'respuesta');
-                    return Navigator.pushNamed(context, 'respuesta');
+                    return Navigator.popAndPushNamed(context, 'respuesta');
+                    // return Navigator.pushNamed(context, 'respuesta');
                   }
                 }),
               ),

@@ -18,7 +18,7 @@ class BuscarPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
               child: TextField(
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 onChanged: (String value) {
                   productosService.idCodigo = value;
                 },
