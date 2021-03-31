@@ -8,6 +8,12 @@ import 'package:provider/provider.dart';
 class ListaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    salirNoFound() {
+      Future.delayed(Duration(milliseconds: 2000), () {
+        Navigator.popAndPushNamed(context, 'buscar');
+      });
+    }
+
     final productosService = new ProductosServices();
     // productosService.getProductosPorNombre('00-10');
     final producService = Provider.of<ProductosServices>(context);
@@ -17,31 +23,52 @@ class ListaPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Lista de artículos'),
       ),
-      body: 
-      FutureBuilder(
-        future:
-            productosService.getProductosPorNombre(producService.idCodigo),
-        builder: (BuildContext context, AsyncSnapshot<List<Productos>> snapshot) {
-          if (snapshot.hasData) {
+      body: FutureBuilder(
+        future: productosService.getProductosPorNombre(producService.idCodigo),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<Productos>> snapshot) {
+          print('Listar -Data ${snapshot.data}');
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasData && snapshot.data != null) {
             return ListView(
-              children: snapshot.data
-                  .map(
-                    (Productos producto) {
-                      double precio = double.parse(producto.precioUnitario);
-                      return ListTile(
-                      title: Text(producto.nombreArticulo),
-                      subtitle: Text('\$${precio.toStringAsFixed(2)}'),
-                      onTap: (){
-                        Navigator.popAndPushNamed(context, 'respuesta');
-                        producService.idCodigo = '00-040';
-                      },
-                    );
-                    } 
-                  )
-                  .toList(),
+              children: snapshot.data.map((Productos producto) {
+                return ListTile(
+                  title: Text(producto.nombreArticulo),
+                  onTap: () {
+                    producService.idCodigo = '${producto.clave}';
+                    print('Clave: ${producto.clave}');
+                    Navigator.popAndPushNamed(context, 'respuesta');
+                  },
+                );
+              }).toList(),
             );
           } else {
-            return CircularProgressIndicator();
+            salirNoFound();
+            return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: size.width * 0.8,
+                    height: 50,
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    margin: EdgeInsets.symmetric(horizontal: size.width * 0.10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                            begin: Alignment.centerRight,
+                            end: Alignment.bottomCenter,
+                            colors: [Colors.red, Colors.redAccent])),
+                    child: Text(
+                      'Producto no encontrado',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ]);
           }
         },
       ),

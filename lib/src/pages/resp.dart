@@ -9,12 +9,16 @@ class RespuestaPage extends StatefulWidget {
 }
 
 class _RespuestaPageState extends State<RespuestaPage> {
-  cambiarPagina(){
-
-    Future.delayed(Duration(milliseconds: 2000), (){
-    Navigator.popAndPushNamed(context, 'home');
+  cambiarPagina() {
+    Future.delayed(Duration(milliseconds: 3500), () {
+      Navigator.popAndPushNamed(context, 'home');
     });
+  }
 
+  cambiarError() {
+    Future.delayed(Duration(milliseconds: 1500), () {
+      Navigator.popAndPushNamed(context, 'home');
+    });
   }
 
   @override
@@ -126,7 +130,7 @@ class _RespuestaPageState extends State<RespuestaPage> {
             ],
           );
         } else {
-          cambiarPagina();
+          cambiarError();
           return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
               width: size.width * 0.8,

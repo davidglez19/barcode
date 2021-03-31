@@ -13,24 +13,21 @@ class ProductosList {
 
   ProductosList.fromJsonList(List<dynamic> jsonList) {
     if (jsonList == null) return;
-    for(var item in jsonList){
+    for (var item in jsonList) {
       final producto = new Productos.fromJson(item);
       productosList.add(producto);
     }
   }
-
 }
 
-
 class Productos extends ChangeNotifier {
-  
-
   Productos({
     this.articuloId,
     this.nombreArticulo,
     this.precioUnitario,
     this.existencia,
     this.unidadVenta,
+    this.clave,
   });
 
   int articuloId;
@@ -38,8 +35,7 @@ class Productos extends ChangeNotifier {
   String precioUnitario;
   String existencia;
   String unidadVenta;
-
-  
+  String clave;
 
   factory Productos.fromJson(Map<String, dynamic> json) => Productos(
         articuloId: json["ARTICULO_ID"],
@@ -47,6 +43,7 @@ class Productos extends ChangeNotifier {
         precioUnitario: json["PRECIO_UNITARIO"],
         existencia: json["EXISTENCIA"],
         unidadVenta: json["UNIDAD_VENTA"],
+        clave: json["CLAVE"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -55,5 +52,6 @@ class Productos extends ChangeNotifier {
         "PRECIO_UNITARIO": precioUnitario,
         "EXISTENCIA": existencia,
         "UNIDAD_VENTA": unidadVenta,
+        "CLAVE": clave,
       };
 }

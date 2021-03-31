@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:barcode/src/models/producto.model.dart';
 
@@ -16,15 +17,30 @@ class ProductosServices extends ChangeNotifier {
     notifyListeners();
   }
 
+  String _idNombre;
+
+  String get idNombre {
+    return this._idNombre;
+  }
+
+  set idNombre(String nombre) {
+    this._idNombre = nombre;
+    notifyListeners();
+  }
+
 // http://192.168.0.26:1989/api/productos
 // https://serverssc.herokuapp.com/api/productos
 //http://ursoft.ddns.net/verificador/public/articulos/00-120
 
-  String _url = 'ursoft.ddns.net';
+  // String _url = pref.;
 
   Future getProductos(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final urlHost = prefs.getString('url');
+
     print(id);
-    final url = Uri.http(_url, 'verificador/public/articulos/$id');
+    print(urlHost);
+    final url = Uri.http(urlHost, 'verificator-app/v1/articulos/$id');
     final resp = await http.get(url);
 
     final decodedData = json.decode(resp.body);
@@ -38,8 +54,27 @@ class ProductosServices extends ChangeNotifier {
   }
 
   Future<List<Productos>> getProductosPorNombre(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final urlHost = prefs.getString('url');
     print(id);
-    final url = Uri.http(_url, 'verificador/public/articulos/clave/$id');
+    final url = Uri.http(urlHost, 'verificator-app/v1/articulos/clave/$id');
+    final resp = await http.get(url);
+
+    final decodedData = json.decode(resp.body);
+    print(decodedData.length);
+    print('Data del http: $decodedData');
+
+    final productos = new ProductosList.fromJsonList(decodedData);
+    print(productos.productosList[0].nombreArticulo);
+
+    return productos.productosList;
+  }
+
+  Future<List<Productos>> getProductosPorNombreId(String nombre) async {
+    final prefs = await SharedPreferences.getInstance();
+    final urlHost = prefs.getString('url');
+    print(nombre);
+    final url = Uri.http(urlHost, 'verificator-app/v1/articulos/clave/$nombre');
     final resp = await http.get(url);
 
     final decodedData = json.decode(resp.body);

@@ -7,7 +7,6 @@ class BuscarPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // final size = MediaQuery.of(context).size;
     final productosService = Provider.of<ProductosServices>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Buscar por nombre'),
@@ -31,7 +30,7 @@ class BuscarPage extends StatelessWidget {
               child: TextField(
                 keyboardType: TextInputType.text,
                 onChanged: (String value) {
-                  print(value);
+                  productosService.idNombre = value;
                 },
                 decoration: InputDecoration(
                     icon: Icon(Icons.search), labelText: 'Nombre'),
@@ -41,7 +40,8 @@ class BuscarPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, 'listar');
+                    // Navigator.pushNamed(context, 'listar');
+                    Navigator.popAndPushNamed(context, 'listar');
                   },
                   child: ListTile(
                     leading: Icon(

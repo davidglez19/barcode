@@ -1,13 +1,15 @@
-import 'package:barcode/src/services/produto.serivice.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:barcode/src/services/produto.serivice.dart';
 
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final _productoServices = Provider.of<ProductosServices>(context);
+    final productoServices = Provider.of<ProductosServices>(context);
 
     final size = MediaQuery.of(context).size;
     final _textStyle = TextStyle(
@@ -22,7 +24,9 @@ class HomePage extends StatelessWidget {
               child: IconButton(
                 icon: Icon(Icons.settings),
                 tooltip: 'Herramientas',
-                onPressed: () {},
+                onPressed: () {
+                  _showDialog(context);
+                },
               ),
             ),
           ],
@@ -38,7 +42,7 @@ class HomePage extends StatelessWidget {
                 child: _boton(_textStyle, 'Escaner', Icons.qr_code, () async {
                   String scannerCode = await FlutterBarcodeScanner.scanBarcode(
                       '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
-                  _productoServices.idCodigo = scannerCode;
+                  productoServices.idCodigo = scannerCode;
                   if (scannerCode != '-1') {
                     return Navigator.popAndPushNamed(context, 'respuesta');
                     // return Navigator.pushNamed(context, 'respuesta');
@@ -46,11 +50,63 @@ class HomePage extends StatelessWidget {
                 }),
               ),
               _boton(_textStyle, 'Buscar', Icons.search, () {
-                Navigator.pushNamed(context, 'buscar');
+                Navigator.popAndPushNamed(context, 'buscar');
               }),
             ]),
           ),
         ));
+  }
+
+  _showDialog(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    return await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: (prefs.getString('url') != null)
+                ? Text('Enlazado al HOST')
+                : Text('Agregar HOST'),
+            content: Container(
+              width: double.infinity,
+              height: 80,
+              child: (prefs.getString('url') != null)
+                  ? Text('${prefs.getString('url')}')
+                  : TextField(
+                      onChanged: (String valor) async {
+                        await prefs.setString('url', valor);
+                        final urlHost = prefs.getString('url');
+                        print(urlHost);
+                      },
+                      keyboardType: TextInputType.url,
+                      decoration: InputDecoration(labelText: 'URL HOST'),
+                    ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'Grabar',
+                    style: TextStyle(color: Colors.green[800]),
+                  )),
+              TextButton(
+                  onPressed: () async {
+                    prefs.remove('url');
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Eliminar',
+                    style: TextStyle(color: Colors.red),
+                  )),
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Cancelar')),
+            ],
+            elevation: 5,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          );
+        });
   }
 
   Widget _boton(
