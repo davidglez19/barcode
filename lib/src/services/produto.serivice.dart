@@ -34,13 +34,17 @@ class ProductosServices extends ChangeNotifier {
 
   // String _url = pref.;
 
+  
+
   Future getProductos(String id) async {
     final prefs = await SharedPreferences.getInstance();
     final urlHost = prefs.getString('url');
 
+    final urlH = 'ursoft.ddns.net';
+
     print(id);
     print(urlHost);
-    final url = Uri.http(urlHost, 'verificator-app/v1/articulos/$id');
+    final url = Uri.http(urlH, 'verificator-app/v1/articulos/$id');
     final resp = await http.get(url);
 
     final decodedData = json.decode(resp.body);

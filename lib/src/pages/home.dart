@@ -17,16 +17,14 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text('Código de barras URSoft'),
+          title: Text('URSoft'),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 10),
               child: IconButton(
                 icon: Icon(Icons.settings),
                 tooltip: 'Herramientas',
-                onPressed: () {
-                  _showDialog(context);
-                },
+                onPressed: () => _opciones(context),
               ),
             ),
           ],
@@ -52,16 +50,37 @@ class HomePage extends StatelessWidget {
               _boton(_textStyle, 'Buscar', Icons.search, () {
                 Navigator.popAndPushNamed(context, 'buscar');
               }),
+              // ElevatedButton(onPressed: () => _opciones(context), child: Text('HOST'))
             ]),
           ),
         ));
   }
 
-  _showDialog(BuildContext context) async {
+ 
+
+  Widget _boton(
+      TextStyle _text, String _title, IconData _icono, Function data) {
+    return ElevatedButton(
+      onPressed: data,
+      child: ListTile(
+        title: Text(
+          _title,
+          style: _text,
+        ),
+        leading: Icon(
+          _icono,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
+
+ Future<void> _opciones(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    return await showDialog(
-        barrierDismissible: false,
+     showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
             title: (prefs.getString('url') != null)
@@ -108,21 +127,3 @@ class HomePage extends StatelessWidget {
           );
         });
   }
-
-  Widget _boton(
-      TextStyle _text, String _title, IconData _icono, Function data) {
-    return ElevatedButton(
-      onPressed: data,
-      child: ListTile(
-        title: Text(
-          _title,
-          style: _text,
-        ),
-        leading: Icon(
-          _icono,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-}

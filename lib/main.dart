@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
         title: 'Barcode',
         initialRoute: 'home',
         routes: {
