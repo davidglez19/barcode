@@ -35,8 +35,6 @@ class ProductosServices extends ChangeNotifier {
 
   // String _url = pref.;
 
-  
-
   Future getProductos(String id) async {
     final prefs = await SharedPreferences.getInstance();
     final urlHost = prefs.getString('url');
@@ -75,11 +73,13 @@ class ProductosServices extends ChangeNotifier {
     return productos.productosList;
   }
 
+// http://ursoft.ddns.net/verificator-app/v1/articulos/nombre/bomba
   Future<List<Productos>> getProductosPorNombreId(String nombre) async {
     final prefs = await SharedPreferences.getInstance();
     final urlHost = prefs.getString('url');
     print(nombre);
-    final url = Uri.http(urlHost, 'verificator-app/v1/articulos/clave/$nombre');
+    final url =
+        Uri.http(urlHost, 'verificator-app/v1/articulos/nombre/$nombre');
     final resp = await http.get(url);
 
     final decodedData = json.decode(resp.body);

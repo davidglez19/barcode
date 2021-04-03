@@ -10,37 +10,38 @@ class RespuestaPage extends StatefulWidget {
 }
 
 class _RespuestaPageState extends State<RespuestaPage> {
-  
-  Future scannerCodigo(BuildContext context) async{
-    final productosService = Provider.of<ProductosServices>(context,listen: false);
+  Future scannerCodigo(BuildContext context) async {
+    final productosService =
+        Provider.of<ProductosServices>(context, listen: false);
     String scannerCode = await FlutterBarcodeScanner.scanBarcode(
-                  '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
-                  if (scannerCode == '-1') {
-                    return Navigator.popAndPushNamed(context, 'home');
-                    // return Navigator.pushNamed(context, 'respuesta');
-                  }else{
-                  productosService.idCodigo = scannerCode;
-                    return Navigator.popAndPushNamed(context, 'respuesta');
-                  }
+        '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
+    if (scannerCode == '-1') {
+      return Navigator.popAndPushNamed(context, 'home');
+      // return Navigator.pushNamed(context, 'respuesta');
+    } else {
+      productosService.idCodigo = scannerCode;
+      return Navigator.popAndPushNamed(context, 'respuesta');
+    }
   }
 
   cambiarPagina() {
-    Future.delayed(Duration(milliseconds: 3500), () {
+    Future.delayed(Duration(milliseconds: 2500), () {
       scannerCodigo(context);
       // Navigator.popAndPushNamed(context, 'home');
     });
   }
 
-   cambiarPagina2() {
-    Future.delayed(Duration(milliseconds: 3500), () {
+  cambiarPagina2() {
+    Future.delayed(Duration(milliseconds: 2500), () {
       // scannerCodigo(context);
       // Navigator.popAndPushNamed(context, 'buscar');
-      Navigator.of(context).pushNamedAndRemoveUntil('buscar', ModalRoute.withName('home'));
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('buscar', ModalRoute.withName('home'));
     });
   }
 
   cambiarError() {
-    Future.delayed(Duration(milliseconds: 1500), () {
+    Future.delayed(Duration(milliseconds: 800), () {
       scannerCodigo(context);
       // Navigator.popAndPushNamed(context, 'home');
     });
@@ -85,15 +86,11 @@ class _RespuestaPageState extends State<RespuestaPage> {
 
           print('VALORES PASANDO: $args');
 
-          if(args == false || args == null){
-            cambiarPagina(); 
-          }else{
+          if (args == false || args == null) {
+            cambiarPagina();
+          } else {
             cambiarPagina2();
-            
           }
-              
-
-          
 
           double precio = double.parse(snapshot.data.precioUnitario);
           return Column(

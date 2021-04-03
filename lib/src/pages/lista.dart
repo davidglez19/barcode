@@ -18,13 +18,18 @@ class ListaPage extends StatelessWidget {
     // productosService.getProductosPorNombre('00-10');
     final producService = Provider.of<ProductosServices>(context);
 
+    final Map args = ModalRoute.of(context).settings.arguments as Map;
+    print("ARGUMENTOS: ${args['activo']}");
+
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text('Lista de artículos'),
       ),
       body: FutureBuilder(
-        future: productosService.getProductosPorNombre(producService.idCodigo),
+        future: (args['activo'])
+            ? productosService.getProductosPorNombre(producService.idCodigo)
+            : productosService.getProductosPorNombreId(producService.idCodigo),
         builder:
             (BuildContext context, AsyncSnapshot<List<Productos>> snapshot) {
           print('Listar -Data ${snapshot.data}');
@@ -40,7 +45,8 @@ class ListaPage extends StatelessWidget {
                     print('Clave: ${producto.clave}');
                     bool valor = true;
                     // Navigator.popAndPushNamed(context, 'respuesta', arguments: valor);
-                    Navigator.of(context).pushReplacementNamed('respuesta',arguments: valor);
+                    Navigator.of(context)
+                        .pushReplacementNamed('respuesta', arguments: valor);
                   },
                 );
               }).toList(),

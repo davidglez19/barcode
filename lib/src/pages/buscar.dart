@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 class BuscarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    TextEditingController _bucarPorClave = TextEditingController();
+    TextEditingController _bucarPornombre = TextEditingController();
     // final size = MediaQuery.of(context).size;
     final productosService = Provider.of<ProductosServices>(context);
     return Scaffold(
@@ -17,10 +19,11 @@ class BuscarPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
               child: TextField(
+                controller: _bucarPorClave,
                 keyboardType: TextInputType.text,
-                onChanged: (String value) {
-                  productosService.idCodigo = value;
-                },
+                // onChanged: (String value) {
+                //   productosService.idCodigo = value;
+                // },
                 decoration: InputDecoration(
                     icon: Icon(Icons.search), labelText: 'Clave'),
               ),
@@ -28,10 +31,13 @@ class BuscarPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
               child: TextField(
+                controller: _bucarPornombre,
                 keyboardType: TextInputType.text,
-                onChanged: (String value) {
-                  productosService.idNombre = value;
-                },
+                // onChanged: (String value) {
+                //   productosService.idNombre = value;
+
+                //   print(_bucarPornombre.text);
+                // },
                 decoration: InputDecoration(
                     icon: Icon(Icons.search), labelText: 'Nombre'),
               ),
@@ -41,7 +47,19 @@ class BuscarPage extends StatelessWidget {
               child: ElevatedButton(
                   onPressed: () {
                     // Navigator.pushNamed(context, 'listar');
-                    Navigator.pushNamed(context, 'listar');
+                    if (_bucarPorClave.text.length > 0) {
+                      productosService.idCodigo = _bucarPorClave.text;
+                      Navigator.pushNamed(context, 'listar', arguments: {
+                        "codigo": productosService.idCodigo,
+                        "activo": true
+                      });
+                    } else {
+                      productosService.idCodigo = _bucarPornombre.text;
+                      Navigator.pushNamed(context, 'listar', arguments: {
+                        "codigo": productosService.idCodigo,
+                        "activo": false
+                      });
+                    }
                   },
                   child: ListTile(
                     leading: Icon(
