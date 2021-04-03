@@ -38,7 +38,9 @@ class ListaPage extends StatelessWidget {
                   onTap: () {
                     producService.idCodigo = '${producto.clave}';
                     print('Clave: ${producto.clave}');
-                    Navigator.popAndPushNamed(context, 'respuesta');
+                    bool valor = true;
+                    // Navigator.popAndPushNamed(context, 'respuesta', arguments: valor);
+                    Navigator.of(context).pushReplacementNamed('respuesta',arguments: valor);
                   },
                 );
               }).toList(),

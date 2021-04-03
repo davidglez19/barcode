@@ -31,6 +31,7 @@ class ProductosServices extends ChangeNotifier {
 // http://192.168.0.26:1989/api/productos
 // https://serverssc.herokuapp.com/api/productos
 //http://ursoft.ddns.net/verificador/public/articulos/00-120
+//http://ursoft.ddns.net/verificator-app/v1/articulos/123
 
   // String _url = pref.;
 
@@ -40,11 +41,11 @@ class ProductosServices extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final urlHost = prefs.getString('url');
 
-    final urlH = 'ursoft.ddns.net';
+    // final urlH = 'ursoft.ddns.net';
 
     print(id);
     print(urlHost);
-    final url = Uri.http(urlH, 'verificator-app/v1/articulos/$id');
+    final url = Uri.http(urlHost, 'verificator-app/v1/articulos/$id');
     final resp = await http.get(url);
 
     final decodedData = json.decode(resp.body);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
 
 import 'package:barcode/src/services/produto.serivice.dart';
@@ -9,15 +10,39 @@ class RespuestaPage extends StatefulWidget {
 }
 
 class _RespuestaPageState extends State<RespuestaPage> {
+  
+  Future scannerCodigo(BuildContext context) async{
+    final productosService = Provider.of<ProductosServices>(context,listen: false);
+    String scannerCode = await FlutterBarcodeScanner.scanBarcode(
+                  '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
+                  if (scannerCode == '-1') {
+                    return Navigator.popAndPushNamed(context, 'home');
+                    // return Navigator.pushNamed(context, 'respuesta');
+                  }else{
+                  productosService.idCodigo = scannerCode;
+                    return Navigator.popAndPushNamed(context, 'respuesta');
+                  }
+  }
+
   cambiarPagina() {
     Future.delayed(Duration(milliseconds: 3500), () {
-      Navigator.popAndPushNamed(context, 'home');
+      scannerCodigo(context);
+      // Navigator.popAndPushNamed(context, 'home');
+    });
+  }
+
+   cambiarPagina2() {
+    Future.delayed(Duration(milliseconds: 3500), () {
+      // scannerCodigo(context);
+      // Navigator.popAndPushNamed(context, 'buscar');
+      Navigator.of(context).pushNamedAndRemoveUntil('buscar', ModalRoute.withName('home'));
     });
   }
 
   cambiarError() {
     Future.delayed(Duration(milliseconds: 1500), () {
-      Navigator.popAndPushNamed(context, 'home');
+      scannerCodigo(context);
+      // Navigator.popAndPushNamed(context, 'home');
     });
   }
 
@@ -52,14 +77,24 @@ class _RespuestaPageState extends State<RespuestaPage> {
     return FutureBuilder(
       future: productos.getProductos(productosService.idCodigo),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
+        final args = ModalRoute.of(context).settings.arguments;
         if (!snapshot.hasData) {
           return CircularProgressIndicator();
         } else if (snapshot.hasData && snapshot.data.precioUnitario != null) {
           // productosService.productosList.add(snapshot.data);
 
-          // TODO:QUITAR LOS COMENTARIOS
+          print('VALORES PASANDO: $args');
 
-          cambiarPagina();
+          if(args == false || args == null){
+            cambiarPagina(); 
+          }else{
+            cambiarPagina2();
+            
+          }
+              
+
+          
+
           double precio = double.parse(snapshot.data.precioUnitario);
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,

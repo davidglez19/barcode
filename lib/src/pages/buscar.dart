@@ -41,7 +41,7 @@ class BuscarPage extends StatelessWidget {
               child: ElevatedButton(
                   onPressed: () {
                     // Navigator.pushNamed(context, 'listar');
-                    Navigator.popAndPushNamed(context, 'listar');
+                    Navigator.pushNamed(context, 'listar');
                   },
                   child: ListTile(
                     leading: Icon(

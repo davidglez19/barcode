@@ -38,17 +38,18 @@ class HomePage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 45),
                 child: _boton(_textStyle, 'Escaner', Icons.qr_code, () async {
+                  bool valor = false;
                   String scannerCode = await FlutterBarcodeScanner.scanBarcode(
                       '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
                   productoServices.idCodigo = scannerCode;
                   if (scannerCode != '-1') {
-                    return Navigator.popAndPushNamed(context, 'respuesta');
+                    return Navigator.popAndPushNamed(context, 'respuesta', arguments: valor);
                     // return Navigator.pushNamed(context, 'respuesta');
                   }
                 }),
               ),
               _boton(_textStyle, 'Buscar', Icons.search, () {
-                Navigator.popAndPushNamed(context, 'buscar');
+                Navigator.pushNamed(context, 'buscar');
               }),
               // ElevatedButton(onPressed: () => _opciones(context), child: Text('HOST'))
             ]),
@@ -56,6 +57,7 @@ class HomePage extends StatelessWidget {
         ));
   }
 
+ 
  
 
   Widget _boton(
@@ -86,20 +88,22 @@ class HomePage extends StatelessWidget {
             title: (prefs.getString('url') != null)
                 ? Text('Enlazado al HOST')
                 : Text('Agregar HOST'),
-            content: Container(
-              width: double.infinity,
-              height: 80,
-              child: (prefs.getString('url') != null)
-                  ? Text('${prefs.getString('url')}')
-                  : TextField(
-                      onChanged: (String valor) async {
-                        await prefs.setString('url', valor);
-                        final urlHost = prefs.getString('url');
-                        print(urlHost);
-                      },
-                      keyboardType: TextInputType.url,
-                      decoration: InputDecoration(labelText: 'URL HOST'),
-                    ),
+            content: SingleChildScrollView(
+                child: Container(
+                width: double.infinity,
+                height: 80,
+                child: (prefs.getString('url') != null)
+                    ? Text('${prefs.getString('url')}')
+                    : TextField(
+                        onChanged: (String valor) async {
+                          await prefs.setString('url', valor);
+                          final urlHost = prefs.getString('url');
+                          print(urlHost);
+                        },
+                        keyboardType: TextInputType.url,
+                        decoration: InputDecoration(labelText: 'URL HOST'),
+                      ),
+              ),
             ),
             actions: [
               TextButton(
