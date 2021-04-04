@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Barcode',
+        title: 'preciosUR',
         initialRoute: 'home',
         routes: {
           'home': (_) => HomePage(),

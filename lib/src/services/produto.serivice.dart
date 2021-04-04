@@ -65,12 +65,15 @@ class ProductosServices extends ChangeNotifier {
 
     final decodedData = json.decode(resp.body);
     print(decodedData.length);
-    print('Data del http: $decodedData');
 
-    final productos = new ProductosList.fromJsonList(decodedData);
-    print(productos.productosList[0].nombreArticulo);
-
-    return productos.productosList;
+    print('Data del http --: $decodedData');
+    if (decodedData.length > 0) {
+      final productos = new ProductosList.fromJsonList(decodedData);
+      print('Lista resp : ${productos.productosList}');
+      return productos.productosList;
+    } else {
+      return [];
+    }
   }
 
 // http://ursoft.ddns.net/verificator-app/v1/articulos/nombre/bomba
@@ -86,9 +89,13 @@ class ProductosServices extends ChangeNotifier {
     print(decodedData.length);
     print('Data del http: $decodedData');
 
-    final productos = new ProductosList.fromJsonList(decodedData);
-    print(productos.productosList[0].nombreArticulo);
+    if (decodedData.length > 0) {
+      final productos = new ProductosList.fromJsonList(decodedData);
+      print(productos.productosList[0].nombreArticulo);
 
-    return productos.productosList;
+      return productos.productosList;
+    } else {
+      return [];
+    }
   }
 }

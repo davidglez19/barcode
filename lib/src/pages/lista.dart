@@ -32,10 +32,13 @@ class ListaPage extends StatelessWidget {
             : productosService.getProductosPorNombreId(producService.idCodigo),
         builder:
             (BuildContext context, AsyncSnapshot<List<Productos>> snapshot) {
-          print('Listar -Data ${snapshot.data}');
           if (!snapshot.hasData) {
+            print('Listar -Data ${snapshot.hasData}');
+
             return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasData && snapshot.data != null) {
+          } else if (snapshot.hasData && snapshot.data.isNotEmpty) {
+            print('Listar -Dotos :=> ${snapshot.hasData}');
+            print('Listar -data :=> ${snapshot.data}');
             return ListView(
               children: snapshot.data.map((Productos producto) {
                 return ListTile(

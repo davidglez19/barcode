@@ -80,8 +80,10 @@ class _RespuestaPageState extends State<RespuestaPage> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         final args = ModalRoute.of(context).settings.arguments;
         if (!snapshot.hasData) {
+          print('Cicular ${snapshot.hasData}');
           return CircularProgressIndicator();
         } else if (snapshot.hasData && snapshot.data.precioUnitario != null) {
+          print('Datos Codigo${snapshot.hasData}');
           // productosService.productosList.add(snapshot.data);
 
           print('VALORES PASANDO: $args');
@@ -163,6 +165,7 @@ class _RespuestaPageState extends State<RespuestaPage> {
           );
         } else {
           cambiarError();
+          print('Error: ${snapshot.hasData}');
           return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
               width: size.width * 0.8,
