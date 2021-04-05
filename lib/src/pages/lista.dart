@@ -10,7 +10,7 @@ class ListaPage extends StatelessWidget {
   Widget build(BuildContext context) {
     salirNoFound() {
       Future.delayed(Duration(milliseconds: 2000), () {
-        Navigator.popAndPushNamed(context, 'buscar');
+        Navigator.pop(context, 'buscar');
       });
     }
 

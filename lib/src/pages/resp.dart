@@ -164,7 +164,11 @@ class _RespuestaPageState extends State<RespuestaPage> {
             ],
           );
         } else {
-          cambiarError();
+          if (args == false || args == null) {
+            cambiarError();
+          } else {
+            cambiarPagina2();
+          }
           print('Error: ${snapshot.hasData}');
           return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(

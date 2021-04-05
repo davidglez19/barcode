@@ -47,13 +47,16 @@ class BuscarPage extends StatelessWidget {
               child: ElevatedButton(
                   onPressed: () {
                     // Navigator.pushNamed(context, 'listar');
-                    if (_bucarPorClave.text.length > 0) {
+
+                    if (_bucarPorClave.text.length > 0 &&
+                        _bucarPornombre.text.isEmpty) {
                       productosService.idCodigo = _bucarPorClave.text;
                       Navigator.pushNamed(context, 'listar', arguments: {
                         "codigo": productosService.idCodigo,
                         "activo": true
                       });
-                    } else {
+                    } else if (_bucarPornombre.text.length > 0 &&
+                        _bucarPorClave.text.isEmpty) {
                       productosService.idCodigo = _bucarPornombre.text;
                       Navigator.pushNamed(context, 'listar', arguments: {
                         "codigo": productosService.idCodigo,

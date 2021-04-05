@@ -62,9 +62,11 @@ class ProductosServices extends ChangeNotifier {
     print(id);
     final url = Uri.http(urlHost, 'verificator-app/v1/articulos/clave/$id');
     final resp = await http.get(url);
-
+    if (resp.statusCode != 200) {
+      return [];
+    }
     final decodedData = json.decode(resp.body);
-    print(decodedData.length);
+    // print(decodedData);
 
     print('Data del http --: $decodedData');
     if (decodedData.length > 0) {
@@ -84,6 +86,11 @@ class ProductosServices extends ChangeNotifier {
     final url =
         Uri.http(urlHost, 'verificator-app/v1/articulos/nombre/$nombre');
     final resp = await http.get(url);
+    if (resp.statusCode != 200) {
+      return [];
+    }
+
+    print('Valores de la resupuesta ${resp.body}');
 
     final decodedData = json.decode(resp.body);
     print(decodedData.length);
