@@ -1,3 +1,4 @@
+import 'package:connection_status_bar/connection_status_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,6 +48,7 @@ class HomePage extends StatelessWidget {
                         await FlutterBarcodeScanner.scanBarcode(
                             '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
                     productoServices.idCodigo = scannerCode;
+                    print('VALOR SCANEADOS ========> $scannerCode');
                     if (scannerCode != '-1') {
                       return Navigator.popAndPushNamed(context, 'respuesta',
                           arguments: valor);

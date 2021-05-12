@@ -80,9 +80,10 @@ class _RespuestaPageState extends State<RespuestaPage> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         final args = ModalRoute.of(context).settings.arguments;
         if (!snapshot.hasData) {
-          print('Cicular ${snapshot.hasData}');
+          print('Cicular ===> ${snapshot.hasData}');
+          print('Data ===> ${snapshot.data}');
           return CircularProgressIndicator();
-        } else if (snapshot.hasData && snapshot.data.precioUnitario != null) {
+        } else if (snapshot.hasData && snapshot.data?.precioUnitario != null) {
           print('Datos Codigo${snapshot.hasData}');
           // productosService.productosList.add(snapshot.data);
 

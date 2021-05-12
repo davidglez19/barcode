@@ -44,16 +44,30 @@ class ProductosServices extends ChangeNotifier {
     print(id);
     print(urlHost);
     final url = Uri.http(urlHost, 'verificator-app/v1/articulos/$id');
-    final resp = await http.get(url);
+    try {
+      final resp = await http.get(url);
+      if (id.length > 20 || id.contains('/')) {
+        return Productos.fromJson({
+          "ARTICULO_ID": null,
+          "NOMBRE_ARTICULO": null,
+          "PRECIO_UNITARIO": null,
+          "EXISTENCIA": null,
+          "UNIDAD_VENTA": null,
+          "CLAVE": null,
+        });
+      }
+      print('STATUS => ${resp.statusCode}');
+      final decodedData = json.decode(resp.body);
+      print('DECODEDATA => $decodedData');
+      print(decodedData.length);
 
-    final decodedData = json.decode(resp.body);
-    print(decodedData.length);
+      final producto = new Productos.fromJson(decodedData);
 
-    final producto = new Productos.fromJson(decodedData);
-
-    print('DATOS:  ${producto.precioUnitario}');
-
-    return producto;
+      print('DATOS:  ${producto.precioUnitario}');
+      return producto;
+    } catch (err) {
+      return;
+    }
   }
 
   Future<List<Productos>> getProductosPorNombre(String id) async {
