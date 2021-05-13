@@ -1,9 +1,13 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:barcode/src/models/producto.model.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 
 class ProductosServices extends ChangeNotifier {
   String _idCodigo;
@@ -34,8 +38,60 @@ class ProductosServices extends ChangeNotifier {
 //http://ursoft.ddns.net/verificator-app/v1/articulos/123
 
   // String _url = pref.;
+/*
+  checkConnection() async {
+    print("The statement 'this machine is connected to the Internet' is: ");
+    print(await DataConnectionChecker().hasConnection);
+    // returns a bool
+
+    // We can also get an enum value instead of a bool
+    print("Current status: ${await DataConnectionChecker().connectionStatus}");
+    // prints either DataConnectionStatus.connected
+    // or DataConnectionStatus.disconnected
+
+    // This returns the last results from the last call
+    // to either hasConnection or connectionStatus
+    print("Last results: ${DataConnectionChecker().lastTryResults}");
+
+    // actively listen for status updates
+    // this will cause DataConnectionChecker to check periodically
+    // with the interval specified in DataConnectionChecker().checkInterval
+    // until listener.cancel() is called
+    var listener = DataConnectionChecker().onStatusChange.listen((status) {
+      switch (status) {
+        case DataConnectionStatus.connected:
+          print('Data connection is available.');
+          break;
+        case DataConnectionStatus.disconnected:
+          print('You are disconnected from the internet.');
+          break;
+      }
+    });
+
+    // close listener after 30 seconds, so the program doesn't run forever
+    await Future.delayed(Duration(seconds: 30));
+    await listener.cancel();
+  }*/
 
   Future getProductos(String id) async {
+    var listener = DataConnectionChecker().onStatusChange.listen((status) {
+      switch (status) {
+        case DataConnectionStatus.connected:
+          print('Data connection is available.');
+          break;
+        case DataConnectionStatus.disconnected:
+          print('You are disconnected from the internet.');
+          break;
+      }
+    });
+
+    // close listener after 30 seconds, so the program doesn't run forever
+    await Future.delayed(Duration(milliseconds: 800));
+    await listener.cancel();
+
+    DataConnectionStatus status =
+        await DataConnectionChecker().connectionStatus;
+
     final prefs = await SharedPreferences.getInstance();
     final urlHost = prefs.getString('url');
 
@@ -43,30 +99,41 @@ class ProductosServices extends ChangeNotifier {
 
     print(id);
     print(urlHost);
-    final url = Uri.http(urlHost, 'verificator-app/v1/articulos/$id');
-    try {
-      final resp = await http.get(url);
-      if (id.length > 20 || id.contains('/')) {
-        return Productos.fromJson({
-          "ARTICULO_ID": null,
-          "NOMBRE_ARTICULO": null,
-          "PRECIO_UNITARIO": null,
-          "EXISTENCIA": null,
-          "UNIDAD_VENTA": null,
-          "CLAVE": null,
-        });
+    if (status == DataConnectionStatus.connected) {
+      print('Conexion exitosa');
+      final url = Uri.http(urlHost, 'verificator-app/v1/articulos/$id');
+      try {
+        final resp = await http.get(url).timeout(const Duration(seconds: 8));
+        if (id.length > 20 || id.contains('/') || resp.statusCode == 404) {
+          return Productos.fromJson({
+            "ARTICULO_ID": null,
+            "NOMBRE_ARTICULO": null,
+            "PRECIO_UNITARIO": null,
+            "EXISTENCIA": null,
+            "UNIDAD_VENTA": null,
+            "CLAVE": null,
+          });
+        }
+        print('STATUS => ${resp.statusCode}');
+        final decodedData = json.decode(resp.body);
+        print('DECODEDATA => $decodedData');
+        print(decodedData.length);
+
+        final producto = new Productos.fromJson(decodedData);
+
+        print('DATOS:  ${producto.precioUnitario}');
+        return producto;
+      } on TimeoutException catch (_) {
+        return peticionError();
+      } on SocketException {
+        return peticionError();
+      } on HttpException {
+        return peticionError();
+      } on FormatException {
+        return peticionError();
       }
-      print('STATUS => ${resp.statusCode}');
-      final decodedData = json.decode(resp.body);
-      print('DECODEDATA => $decodedData');
-      print(decodedData.length);
-
-      final producto = new Productos.fromJson(decodedData);
-
-      print('DATOS:  ${producto.precioUnitario}');
-      return producto;
-    } catch (err) {
-      return;
+    } else {
+      return peticionError();
     }
   }
 
@@ -118,5 +185,16 @@ class ProductosServices extends ChangeNotifier {
     } else {
       return [];
     }
+  }
+
+  peticionError() {
+    return Productos.fromJson({
+      "ARTICULO_ID": null,
+      "NOMBRE_ARTICULO": null,
+      "PRECIO_UNITARIO": null,
+      "EXISTENCIA": null,
+      "UNIDAD_VENTA": null,
+      "CLAVE": null,
+    });
   }
 }

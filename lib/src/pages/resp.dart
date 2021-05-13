@@ -1,3 +1,4 @@
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
@@ -11,28 +12,34 @@ class RespuestaPage extends StatefulWidget {
 
 class _RespuestaPageState extends State<RespuestaPage> {
   Future scannerCodigo(BuildContext context) async {
-    final productosService =
-        Provider.of<ProductosServices>(context, listen: false);
-    String scannerCode = await FlutterBarcodeScanner.scanBarcode(
-        '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
-    if (scannerCode == '-1') {
-      return Navigator.popAndPushNamed(context, 'home');
-      // return Navigator.pushNamed(context, 'respuesta');
+    DataConnectionStatus status = await checkConnection();
+
+    if (status == DataConnectionStatus.connected) {
+      final productosService =
+          Provider.of<ProductosServices>(context, listen: false);
+      String scannerCode = await FlutterBarcodeScanner.scanBarcode(
+          '#2D96F5', 'Cancelar', false, ScanMode.BARCODE);
+      if (scannerCode == '-1') {
+        return Navigator.popAndPushNamed(context, 'home');
+        // return Navigator.pushNamed(context, 'respuesta');
+      } else {
+        productosService.idCodigo = scannerCode;
+        return Navigator.popAndPushNamed(context, 'respuesta');
+      }
     } else {
-      productosService.idCodigo = scannerCode;
-      return Navigator.popAndPushNamed(context, 'respuesta');
+      _sinConexion(context);
     }
   }
 
   cambiarPagina() {
-    Future.delayed(Duration(milliseconds: 2500), () {
+    Future.delayed(Duration(milliseconds: 1500), () {
       scannerCodigo(context);
       // Navigator.popAndPushNamed(context, 'home');
     });
   }
 
   cambiarPagina2() {
-    Future.delayed(Duration(milliseconds: 2500), () {
+    Future.delayed(Duration(milliseconds: 1500), () {
       // scannerCodigo(context);
       // Navigator.popAndPushNamed(context, 'buscar');
       Navigator.of(context)
@@ -45,6 +52,12 @@ class _RespuestaPageState extends State<RespuestaPage> {
       scannerCodigo(context);
       // Navigator.popAndPushNamed(context, 'home');
     });
+  }
+
+  @override
+  void dispose() {
+    DataConnectionChecker().onStatusChange.listen((event) {}).cancel();
+    super.dispose();
   }
 
   @override
@@ -196,4 +209,65 @@ class _RespuestaPageState extends State<RespuestaPage> {
       },
     );
   }
+}
+
+Future<void> _sinConexion(BuildContext context) async {
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Icon(
+            Icons.wifi_off,
+            color: Color(0xffff0000),
+            size: 35,
+          ),
+          content: Container(
+            height: 152,
+            child: Column(children: [
+              Text(
+                'Sin Conexión',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Se ha perdido la conexión a internet verifique e intente de nuevo',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xff8a8a8a),
+                ),
+              ),
+              Divider(),
+              TextButton(
+                  onPressed: () => Navigator.of(context)
+                      .pushNamedAndRemoveUntil(
+                          'home', ModalRoute.withName('home')),
+                  child: Text(
+                    'Aceptar',
+                    style: TextStyle(color: Color(0xffff0011)),
+                  ))
+            ]),
+          ),
+        );
+      });
+}
+
+Future<DataConnectionStatus> checkConnection() async {
+  // var listener = DataConnectionChecker().onStatusChange.listen((status) {
+  //   switch (status) {
+  //     case DataConnectionStatus.connected:
+  //       print('Data connection is available.');
+  //       break;
+  //     case DataConnectionStatus.disconnected:
+  //       print('You are disconnected from the internet.');
+  //       break;
+  //   }
+  // });
+
+  // close listener after 30 seconds, so the program doesn't run forever
+  // await Future.delayed(Duration(milliseconds: 3000));
+
+  // await listener.cancel();
+
+  return await DataConnectionChecker().connectionStatus;
 }

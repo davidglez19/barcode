@@ -33,6 +33,7 @@ dependencies:
   http: ^0.13.1
   shared_preferences: ^2.0.5
   connection_status_bar: ^1.1.5
+  data_connection_checker: ^0.3.4
 
 
 dev_dependencies:
