@@ -76,8 +76,6 @@ class ProductosServices extends ChangeNotifier {
     await listener.cancel();
   }*/
   Future getProductos(String id) async {
-    cancellationToken = CancellationToken();
-
     // cancellationToken.cancel();
     // print('CANCELARTOKEN => ${cancellationToken}');
 
@@ -111,31 +109,41 @@ class ProductosServices extends ChangeNotifier {
       final url = Uri.http(urlHost, 'verificator-app/v1/articulos/$id');
 
       try {
+        cancellationToken = CancellationToken();
+        print(cancellationToken?.isCanceled);
         return await HttpClientHelper.get(url,
                 cancelToken: cancellationToken,
                 timeRetry: Duration(milliseconds: 800),
                 retries: 3,
                 timeLimit: Duration(seconds: 6))
             .then((resp) {
-          if (id.length > 20 || id.contains('/') || resp.statusCode == 404) {
-            return Productos.fromJson({
-              "ARTICULO_ID": null,
-              "NOMBRE_ARTICULO": null,
-              "PRECIO_UNITARIO": null,
-              "EXISTENCIA": null,
-              "UNIDAD_VENTA": null,
-              "CLAVE": null,
-            });
+          if (resp != null) {
+            print('CANCELADO');
+            if (id.length > 20 || id.contains('/') || resp.statusCode == 404) {
+              return Productos.fromJson({
+                "ARTICULO_ID": null,
+                "NOMBRE_ARTICULO": 'ERROR EN EL HOST',
+                "PRECIO_UNITARIO": null,
+                "EXISTENCIA": null,
+                "UNIDAD_VENTA": null,
+                "CLAVE": null,
+              });
+            }
+            print('STATUS => ${resp.statusCode}');
+            final decodedData = json.decode(resp.body);
+            print('DECODEDATA => $decodedData');
+            print(decodedData.length);
+
+            final producto = new Productos.fromJson(decodedData);
+
+            print('DATOS:  ${producto.precioUnitario}');
+            return producto;
+          } else {
+            print('RESP NULL');
+            cancellationToken.cancel();
+            print(cancellationToken.isCanceled);
+            return peticionError();
           }
-          print('STATUS => ${resp.statusCode}');
-          final decodedData = json.decode(resp.body);
-          print('DECODEDATA => $decodedData');
-          print(decodedData.length);
-
-          final producto = new Productos.fromJson(decodedData);
-
-          print('DATOS:  ${producto.precioUnitario}');
-          return producto;
         });
       } on TimeoutException catch (_) {
         // cancel();
@@ -228,22 +236,29 @@ class ProductosServices extends ChangeNotifier {
 
 */
   Future<List<Productos>> getProductosPorNombre(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final urlHost = prefs.getString('url');
-    print(id);
-    final url = Uri.http(urlHost, 'verificator-app/v1/articulos/clave/$id');
-    final resp = await http.get(url);
-    if (resp.statusCode != 200) {
-      return [];
-    }
-    final decodedData = json.decode(resp.body);
-    // print(decodedData);
+    DataConnectionStatus status =
+        await DataConnectionChecker().connectionStatus;
 
-    print('Data del http --: $decodedData');
-    if (decodedData.length > 0) {
-      final productos = new ProductosList.fromJsonList(decodedData);
-      print('Lista resp : ${productos.productosList}');
-      return productos.productosList;
+    if (status == DataConnectionStatus.connected) {
+      final prefs = await SharedPreferences.getInstance();
+      final urlHost = prefs.getString('url');
+      print(id);
+      final url = Uri.http(urlHost, 'verificator-app/v1/articulos/clave/$id');
+      final resp = await http.get(url);
+      if (resp.statusCode != 200) {
+        return [];
+      }
+      final decodedData = json.decode(resp.body);
+      // print(decodedData);
+
+      print('Data del http --: $decodedData');
+      if (decodedData.length > 0) {
+        final productos = new ProductosList.fromJsonList(decodedData);
+        print('Lista resp : ${productos.productosList}');
+        return productos.productosList;
+      } else {
+        return [];
+      }
     } else {
       return [];
     }
@@ -251,27 +266,34 @@ class ProductosServices extends ChangeNotifier {
 
 // http://ursoft.ddns.net/verificator-app/v1/articulos/nombre/bomba
   Future<List<Productos>> getProductosPorNombreId(String nombre) async {
-    final prefs = await SharedPreferences.getInstance();
-    final urlHost = prefs.getString('url');
-    print(nombre);
-    final url =
-        Uri.http(urlHost, 'verificator-app/v1/articulos/nombre/$nombre');
-    final resp = await http.get(url);
-    if (resp.statusCode != 200) {
-      return [];
-    }
+    DataConnectionStatus status =
+        await DataConnectionChecker().connectionStatus;
 
-    print('Valores de la resupuesta ${resp.body}');
+    if (status == DataConnectionStatus.connected) {
+      final prefs = await SharedPreferences.getInstance();
+      final urlHost = prefs.getString('url');
+      print(nombre);
+      final url =
+          Uri.http(urlHost, 'verificator-app/v1/articulos/nombre/$nombre');
+      final resp = await http.get(url);
+      if (resp.statusCode != 200) {
+        return [];
+      }
 
-    final decodedData = json.decode(resp.body);
-    print(decodedData.length);
-    print('Data del http: $decodedData');
+      print('Valores de la resupuesta ${resp.body}');
 
-    if (decodedData.length > 0) {
-      final productos = new ProductosList.fromJsonList(decodedData);
-      print(productos.productosList[0].nombreArticulo);
+      final decodedData = json.decode(resp.body);
+      print(decodedData.length);
+      print('Data del http: $decodedData');
 
-      return productos.productosList;
+      if (decodedData.length > 0) {
+        final productos = new ProductosList.fromJsonList(decodedData);
+        print(productos.productosList[0].nombreArticulo);
+
+        return productos.productosList;
+      } else {
+        return [];
+      }
     } else {
       return [];
     }
@@ -280,7 +302,7 @@ class ProductosServices extends ChangeNotifier {
   peticionError() {
     return Productos.fromJson({
       "ARTICULO_ID": null,
-      "NOMBRE_ARTICULO": null,
+      "NOMBRE_ARTICULO": 'ERROR EN EL HOST',
       "PRECIO_UNITARIO": null,
       "EXISTENCIA": null,
       "UNIDAD_VENTA": null,

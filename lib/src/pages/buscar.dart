@@ -1,4 +1,5 @@
 import 'package:barcode/src/services/produto.serivice.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -45,23 +46,28 @@ class BuscarPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     // Navigator.pushNamed(context, 'listar');
-
-                    if (_bucarPorClave.text.length > 0 &&
-                        _bucarPornombre.text.isEmpty) {
-                      productosService.idCodigo = _bucarPorClave.text;
-                      Navigator.pushNamed(context, 'listar', arguments: {
-                        "codigo": productosService.idCodigo,
-                        "activo": true
-                      });
-                    } else if (_bucarPornombre.text.length > 0 &&
-                        _bucarPorClave.text.isEmpty) {
-                      productosService.idCodigo = _bucarPornombre.text;
-                      Navigator.pushNamed(context, 'listar', arguments: {
-                        "codigo": productosService.idCodigo,
-                        "activo": false
-                      });
+                    DataConnectionStatus status = await checkConnection();
+                    print(status);
+                    if (status == DataConnectionStatus.connected) {
+                      if (_bucarPorClave.text.length > 0 &&
+                          _bucarPornombre.text.isEmpty) {
+                        productosService.idCodigo = _bucarPorClave.text;
+                        Navigator.pushNamed(context, 'listar', arguments: {
+                          "codigo": productosService.idCodigo,
+                          "activo": true
+                        });
+                      } else if (_bucarPornombre.text.length > 0 &&
+                          _bucarPorClave.text.isEmpty) {
+                        productosService.idCodigo = _bucarPornombre.text;
+                        Navigator.pushNamed(context, 'listar', arguments: {
+                          "codigo": productosService.idCodigo,
+                          "activo": false
+                        });
+                      }
+                    } else {
+                      _sinConexion(context);
                     }
                   },
                   child: ListTile(
@@ -80,4 +86,62 @@ class BuscarPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<DataConnectionStatus> checkConnection() async {
+  // var listener = DataConnectionChecker().onStatusChange.listen((status) {
+  //   switch (status) {
+  //     case DataConnectionStatus.connected:
+  //       print('Data connection is available.');
+  //       break;
+  //     case DataConnectionStatus.disconnected:
+  //       print('You are disconnected from the internet.');
+  //       break;
+  //   }
+  // });
+
+  // close listener after 30 seconds, so the program doesn't run forever
+  // await Future.delayed(Duration(milliseconds: 1000));
+  // await listener.cancel();
+
+  return await DataConnectionChecker().connectionStatus;
+}
+
+Future<void> _sinConexion(BuildContext context) async {
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Icon(
+            Icons.wifi_off,
+            color: Color(0xffff0000),
+            size: 35,
+          ),
+          content: Container(
+            height: 152,
+            child: Column(children: [
+              Text(
+                'Sin Conexión',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Se ha perdido la conexión a internet verifique e intente de nuevo',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xff8a8a8a),
+                ),
+              ),
+              Divider(),
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'Aceptar',
+                    style: TextStyle(color: Color(0xffff0011)),
+                  ))
+            ]),
+          ),
+        );
+      });
 }

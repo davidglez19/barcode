@@ -196,7 +196,9 @@ class _RespuestaPageState extends State<RespuestaPage> {
                       end: Alignment.bottomCenter,
                       colors: [Colors.red, Colors.redAccent])),
               child: Text(
-                'Producto no encontrado',
+                (snapshot.data.nombreArticulo == null)
+                    ? 'Producto no encontrado'
+                    : '${snapshot.data.nombreArticulo}',
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
