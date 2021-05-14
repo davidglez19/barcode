@@ -4,12 +4,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:http_client_helper/http_client_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:barcode/src/models/producto.model.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 
 class ProductosServices extends ChangeNotifier {
+  CancellationToken cancellationToken;
+
   String _idCodigo;
 
   String get idCodigo {
@@ -72,7 +75,92 @@ class ProductosServices extends ChangeNotifier {
     await Future.delayed(Duration(seconds: 30));
     await listener.cancel();
   }*/
+  Future getProductos(String id) async {
+    cancellationToken = CancellationToken();
 
+    // cancellationToken.cancel();
+    // print('CANCELARTOKEN => ${cancellationToken}');
+
+    var listener = DataConnectionChecker().onStatusChange.listen((status) {
+      switch (status) {
+        case DataConnectionStatus.connected:
+          print('Data connection is available.');
+          break;
+        case DataConnectionStatus.disconnected:
+          print('You are disconnected from the internet.');
+          break;
+      }
+    });
+
+    // close listener after 30 seconds, so the program doesn't run forever
+    await Future.delayed(Duration(milliseconds: 800));
+    await listener.cancel();
+
+    DataConnectionStatus status =
+        await DataConnectionChecker().connectionStatus;
+
+    final prefs = await SharedPreferences.getInstance();
+    final urlHost = prefs.getString('url');
+
+    // final urlH = 'ursoft.ddns.net';
+
+    print(id);
+    print(urlHost);
+    if (status == DataConnectionStatus.connected) {
+      print('Conexion exitosa');
+      final url = Uri.http(urlHost, 'verificator-app/v1/articulos/$id');
+
+      try {
+        return await HttpClientHelper.get(url,
+                cancelToken: cancellationToken,
+                timeRetry: Duration(milliseconds: 800),
+                retries: 3,
+                timeLimit: Duration(seconds: 6))
+            .then((resp) {
+          if (id.length > 20 || id.contains('/') || resp.statusCode == 404) {
+            return Productos.fromJson({
+              "ARTICULO_ID": null,
+              "NOMBRE_ARTICULO": null,
+              "PRECIO_UNITARIO": null,
+              "EXISTENCIA": null,
+              "UNIDAD_VENTA": null,
+              "CLAVE": null,
+            });
+          }
+          print('STATUS => ${resp.statusCode}');
+          final decodedData = json.decode(resp.body);
+          print('DECODEDATA => $decodedData');
+          print(decodedData.length);
+
+          final producto = new Productos.fromJson(decodedData);
+
+          print('DATOS:  ${producto.precioUnitario}');
+          return producto;
+        });
+      } on TimeoutException catch (_) {
+        // cancel();
+        return peticionError();
+      } on OperationCanceledError catch (_) {
+        // cancel();
+        return peticionError();
+      } on SocketException catch (_) {
+        // cancel();
+        return peticionError();
+      } catch (_) {
+        cancel();
+        return peticionError();
+      }
+    } else {
+      return peticionError();
+    }
+  }
+
+  void cancel() {
+    print('Entro');
+    cancellationToken?.cancel();
+  }
+
+/*
   Future getProductos(String id) async {
     var listener = DataConnectionChecker().onStatusChange.listen((status) {
       switch (status) {
@@ -126,6 +214,7 @@ class ProductosServices extends ChangeNotifier {
       } on TimeoutException catch (_) {
         return peticionError();
       } on SocketException {
+        print('Error el Socket');
         return peticionError();
       } on HttpException {
         return peticionError();
@@ -137,6 +226,7 @@ class ProductosServices extends ChangeNotifier {
     }
   }
 
+*/
   Future<List<Productos>> getProductosPorNombre(String id) async {
     final prefs = await SharedPreferences.getInstance();
     final urlHost = prefs.getString('url');
